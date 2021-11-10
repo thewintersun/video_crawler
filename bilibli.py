@@ -85,7 +85,7 @@ class BiliBiliSpider(object):
                 with open(self.crawled_account_id_file, 'r') as fr:
                     for line in fr:
                         line = line.strip()
-                        self.crawled_account_dict.append(line)
+                        self.crawled_account_dict[line] = 1
         except Exception as e:
             logging.error('Load crawled_account_id_file to crawled list: {}'.format(e))
 
@@ -95,7 +95,7 @@ class BiliBiliSpider(object):
                     for line in fr:
                         line = line.strip()
                         line = line.split(' ')[1]
-                        self.crawled_video_dict.append(line)
+                        self.crawled_video_dict[line] = 1
         except Exception as e:
             logging.error('Load crawled_video_id_file to crawled list: {}'.format(e))
 
@@ -160,6 +160,9 @@ class BiliBiliSpider(object):
                     total_page_number = math.ceil(total_video_number / video_number_one_page)
 
                     for video_id in video_id_list:
+                        if video_id in self.crawled_video_dict:
+                            logging.warning("video_id : {} already crawled, next one".format(video_id))
+                            continue
                         video_url = "https://www.bilibili.com/video/" + video_id
                         logging.warning("Downloading video {}, url: {}".format(video_id, video_url))
                         download_video(video_url, output_dir)
