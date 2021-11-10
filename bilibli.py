@@ -59,6 +59,7 @@ def download_video(url, save_dir):
 
 class BiliBiliSpider(object):
     def __init__(self, args):
+
         self.process_num = args.n
 
         self.input_file = args.input_file
