@@ -165,7 +165,12 @@ class BiliBiliSpider(object):
                             continue
                         video_url = "https://www.bilibili.com/video/" + video_id
                         logging.warning("Downloading video {}, url: {}".format(video_id, video_url))
-                        download_video(video_url, output_dir)
+
+                        video_output_dir = os.path.join(output_dir, video_id)
+                        if not os.path.exists(video_output_dir):
+                            os.mkdir(video_output_dir)
+
+                        download_video(video_url, video_output_dir)
                         self.save_crawled_video(accout_id, video_id)
                     page_id += 1
                 self.save_crawled_account(accout_id)
