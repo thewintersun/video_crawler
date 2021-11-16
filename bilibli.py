@@ -69,12 +69,15 @@ class BiliBiliSpider(object):
 
         self.crawled_account_id_file = os.path.join(self.output_dir, 'temp_account_crawled')
         self.crawled_video_id_file = os.path.join(self.output_dir, 'temp_video_crawled')
+        self.skip_file = os.path.join(self.output_dir, 'temp_skip')
 
         # 保存已经爬取过的账号id
         self.crawled_account_dict = multiprocessing.Manager().dict()
 
         # 保存已经爬取过的视频id
         self.crawled_video_dict = multiprocessing.Manager().dict()
+
+        self.skip_video_dict = multiprocessing.managers.dict()
 
         self.input_list = multiprocessing.Manager().list()
 
@@ -110,6 +113,16 @@ class BiliBiliSpider(object):
                 exit(1)
         except Exception as e:
             logging.error('Load input_list: {}'.format(e))
+
+
+        try:
+            if os.path.exists(self.skip_file):
+                with open(self.skip_file, 'r') as fr:
+                    for line in fr:
+                        line = line.strip()
+                        self.skip_video_dict[line] = 1
+        except Exception as e:
+            logging.error('Load skip_file : {}'.format(e))
 
         logging.warning("Load data success")
         logging.warning("{} video already download".format(len(self.crawled_video_dict)))
@@ -163,12 +176,14 @@ class BiliBiliSpider(object):
                         if video_id in self.crawled_video_dict:
                             logging.warning("video_id : {} already crawled, next one".format(video_id))
                             continue
+                        if video_id in self.skip_video_dict:
+                            logging.warning("video_id : {} skip , next one".format(video_id))
+                            continue
+
                         video_url = "https://www.bilibili.com/video/" + video_id
                         logging.warning("Downloading video {}, url: {}".format(video_id, video_url))
 
                         video_output_dir = os.path.join(output_dir, video_id)
-                        if not os.path.exists(video_output_dir):
-                            os.mkdir(video_output_dir)
 
                         download_video(video_url, video_output_dir)
                         self.save_crawled_video(accout_id, video_id)
