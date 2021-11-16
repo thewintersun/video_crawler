@@ -77,7 +77,7 @@ class BiliBiliSpider(object):
         # 保存已经爬取过的视频id
         self.crawled_video_dict = multiprocessing.Manager().dict()
 
-        self.skip_video_dict = multiprocessing.Manager.dict()
+        self.skip_video_dict = multiprocessing.Manager().dict()
 
         self.input_list = multiprocessing.Manager().list()
 
