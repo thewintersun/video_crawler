@@ -53,7 +53,7 @@ def download_video(url, save_dir):
     """
     if not os.path.exists(save_dir):
         os.mkdir(save_dir)
-    sys.argv = ['you-get', '-o', save_dir, '--playlist', url]
+    sys.argv = ['you-get', '-F', 'dash-flv720', '-o', save_dir, '--playlist', url]
     you_get.main()
 
 
