@@ -247,15 +247,24 @@ def cut_video_dir(dir, cut_ratio):
                 os.remove(input_path)
 
 
-def download_video(url, save_dir, opt):
+def download_video(url, save_dir):
     """
     通过you-get来下载某个视频到指定文件夹
     :param save_dir: 下载到的文件夹
     """
     if not os.path.exists(save_dir):
         os.mkdir(save_dir)
-    if opt == 'default':
-        sys.argv = ['you-get', '-o', save_dir, '--playlist', url]
-    else:
-        sys.argv = ['you-get', '-F', opt, '-o', save_dir, '--playlist', url]
-    you_get.main()
+
+    opt_list = ['dash-flv480', 'dash-flv720', 'dash-flv1080']
+    i = 0
+    ret = 2
+    while i < len(opt_list) and ret != 0:
+        try:
+            cmd_str = f'you-get -f -o ' + save_dir + ' --playlist -F ' + opt_list[i] + ' ' + url
+            ret = subprocess.run(cmd_str, encoding="utf-8", shell=True)
+            ret = ret.returncode
+        except Exception as e:
+            logging.error("download fail : {}".format(e))
+        finally:
+            i = i + 1
+    return ret
