@@ -27,7 +27,7 @@ class CosClient(object):
         self.upload_list = []
         self.uploaded_dict = {}
 
-        self.bucket_name = 'ml-asr-data-1301298951'
+        self.bucket_name = 'ml-data-1301298951'
 
     def load_data(self):
         try:
@@ -62,7 +62,7 @@ class CosClient(object):
 
             for files in os.path.listdir(src_dir):
                 src_path = os.path.join(src_dir, files)
-                dest_path = 'video/bilibili/' + account_id + '/' + video_id + '/' + files
+                dest_path = 'audio/video/bilibili/' + account_id + '/' + video_id + '/' + files
 
                 logging.info("Uploading file {}".format(src_path))
 

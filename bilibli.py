@@ -4,9 +4,8 @@ import math
 import multiprocessing
 import os
 import re
-import sys
 import argparse
-from you_get import common as you_get
+import time
 import utils
 
 
@@ -46,19 +45,6 @@ def get_accout_videoinfo(jsonstr):
     return video_id_list, total_video_number, video_number_one_page
 
 
-def download_video(url, save_dir, opt):
-    """
-    通过you-get来下载某个视频到指定文件夹
-    :param save_dir: 下载到的文件夹
-    """
-    if not os.path.exists(save_dir):
-        os.mkdir(save_dir)
-    if opt == 'default':
-        sys.argv = ['you-get', '-o', save_dir, '--playlist', url]
-    else:
-        sys.argv = ['you-get', '-F', opt, '-o', save_dir, '--playlist', url]
-    you_get.main()
-
 
 class BiliBiliSpider(object):
     def __init__(self, args):
@@ -71,6 +57,8 @@ class BiliBiliSpider(object):
         self.output_dir = args.output_dir
 
         self.download_opt = args.f
+
+        self.cut_ratio = args.cut_ratio
 
         self.crawled_account_id_file = os.path.join(self.output_dir, 'temp_account_crawled')
         self.crawled_video_id_file = os.path.join(self.output_dir, 'temp_video_crawled')
@@ -190,8 +178,11 @@ class BiliBiliSpider(object):
 
                         video_output_dir = os.path.join(output_dir, video_id)
 
-                        download_video(video_url, video_output_dir, self.download_opt)
+                        utils.download_video(video_url, video_output_dir, self.download_opt)
+
                         self.save_crawled_video(accout_id, video_id)
+                        if self.cut_ratio < 1.0:
+                            utils.cut_video_dir(video_output_dir, self.cut_ratio)
                     page_id += 1
                 self.save_crawled_account(accout_id)
 
@@ -216,6 +207,8 @@ def main():
     parser.add_argument('output_dir', help='输出文件夹路径，末尾不要带斜杠')
     parser.add_argument('-n', help='多进程数量（默认为1）', type=int, default=1)
     parser.add_argument('--f', help='视频清晰度：可选： dash-flv720', default='default')
+
+    parser.add_argument('--cut_ratio', help='因为只需要字幕，节省存储资源，将视频画面裁剪，保留底部开始的比例', type=float, default=0.3)
     parser.add_argument('--log', help='输出log到文件，否则输出到控制台', action='store_true')
     args = parser.parse_args()
 
@@ -234,6 +227,6 @@ def test():
     matches = re.findall('https://space.bilibili.com/(\d+)', 'https://space.bilibili.com/300750508/video')
     print(matches)
 
-
 if __name__ == "__main__":
     main()
+

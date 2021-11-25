@@ -4,7 +4,27 @@
 import re
 import random
 import logging
+import string
+import subprocess
+import sys
+
+import cv2
+import os
 import requests
+from you_get import common as you_get
+
+
+CHINESE_PUNC_STOP = '！？｡。'
+CHINESE_PUNC_NON_STOP = '＂＃＄％＆＇（）＊＋，－／：；＜＝＞＠［＼］＾＿｀｛｜｝～｟｠｢｣､、〃《》「」『』【】〔〕〖〗〘〙〚〛〜〝〞〟〰〾〿–—‘’‛“”„‟…‧﹏'
+CHINESE_PUNC_OTHER = '·〈〉-'
+CHINESE_PUNC_LIST = CHINESE_PUNC_STOP + CHINESE_PUNC_NON_STOP + CHINESE_PUNC_OTHER
+
+def str_trans(input_text):
+    old_chars = CHINESE_PUNC_LIST + string.punctuation  # includes all CN and EN punctuations
+    new_chars = ' ' * len(old_chars)
+    del_chars = ''
+    output_text = input_text.translate(str.maketrans(old_chars, new_chars, del_chars))
+    return ''.join(output_text.split())
 
 # User Agent 列表，每次访问随机使用其中一个
 USER_AGENT_LIST = [
@@ -159,4 +179,83 @@ def save_content(path, content, mode):
     except Exception as e:
         logging.error('Save content with {1} mode: {0}'.format(e, mode))
 
+def cut_video(input_path, output_path, cut_ratio):
+    logging.info("opencv cut : {}".format(input_path))
 
+    video_capture = cv2.VideoCapture(input_path)
+    width = int(video_capture.get(cv2.CAP_PROP_FRAME_WIDTH))
+    height = int(video_capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    fps = video_capture.get(cv2.CAP_PROP_FPS)
+
+    height_start = int(height * (1 - cut_ratio))
+    height_end = int(height)
+    new_height = height - height_start
+
+    size = (int(width), int(new_height))
+    videp_writer = cv2.VideoWriter(output_path, cv2.VideoWriter_fourcc(*'mp4v'), fps, size)
+
+    have_more_frame, frame_src = video_capture.read()
+    while have_more_frame:
+        frame_src2 = frame_src[height_start:height_end, 0:int(width)]  # 注意这里是高宽
+        videp_writer.write(frame_src2)
+        have_more_frame, frame_src = video_capture.read()
+    videp_writer.release()
+    video_capture.release()
+
+def cut_video_ffmpeg(input_path, output_path, cut_ratio):
+    logging.info("ffmpeg cut : {}".format(input_path))
+
+    video_capture = cv2.VideoCapture(input_path)
+    width = int(video_capture.get(cv2.CAP_PROP_FRAME_WIDTH))
+    height = int(video_capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
+
+    height_start = int(height * (1 - cut_ratio))
+    new_height = height - height_start
+
+    cmd_str = f'ffmpeg -i "' + input_path + '" -strict -2 -vf crop=' + str(width) + ':' + str(new_height) + ':0:' + str(height_start) + ' -y ' + output_path
+    ret = subprocess.run(cmd_str, encoding="utf-8", shell=True)
+    return ret.returncode
+
+
+def cut_video_dir(dir, cut_ratio):
+    '''
+    裁剪一个文件夹下所有视频文件，保留底部开始一定比例
+    :param dir:
+    :param cut_ratio:
+    :return:
+    '''
+
+    # same to not cut the video
+    if cut_ratio == 1:
+        return
+
+    format_list = ['mp4', 'flv']
+
+    for f in os.listdir(dir):
+
+        file_name = '.'.join(f.split('.')[:-1])
+        file_suffix = f.split('.')[-1]
+
+        if file_suffix in format_list and not file_name.endswith('cut'):
+            input_path = os.path.join(dir, f)
+            print(input_path)
+            output_filename = str_trans(file_name) + "_cut."+file_suffix
+            output_path = os.path.join(dir, output_filename)
+
+            ret = cut_video_ffmpeg(input_path, output_path, cut_ratio)
+            if ret == 0:
+                os.remove(input_path)
+
+
+def download_video(url, save_dir, opt):
+    """
+    通过you-get来下载某个视频到指定文件夹
+    :param save_dir: 下载到的文件夹
+    """
+    if not os.path.exists(save_dir):
+        os.mkdir(save_dir)
+    if opt == 'default':
+        sys.argv = ['you-get', '-o', save_dir, '--playlist', url]
+    else:
+        sys.argv = ['you-get', '-F', opt, '-o', save_dir, '--playlist', url]
+    you_get.main()
