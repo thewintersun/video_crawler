@@ -8,6 +8,7 @@ def batch_cut_file(videoDir, cut_ratio):
             for subd in os.listdir(account_dir):
                 subdir = os.path.join(account_dir, subd)
                 if os.path.isdir(subdir):
+                    print(subdir)
                     utils.cut_video_dir(subdir, cut_ratio)
 
 
