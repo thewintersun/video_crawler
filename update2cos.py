@@ -60,7 +60,7 @@ class CosClient(object):
             src_dir = os.path.join(self.upload_dir, account_id)
             src_dir = os.path.join(src_dir, video_id)
 
-            for files in os.path.listdir(src_dir):
+            for files in os.listdir(src_dir):
                 src_path = os.path.join(src_dir, files)
                 dest_path = 'audio/video/bilibili/' + account_id + '/' + video_id + '/' + files
 
