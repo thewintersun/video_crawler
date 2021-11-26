@@ -178,10 +178,11 @@ class BiliBiliSpider(object):
 
                         ret = utils.download_video(video_url, video_output_dir)
 
+                        self.save_crawled_video(accout_id, video_id)
+
                         if ret != 0:
                             continue
 
-                        self.save_crawled_video(accout_id, video_id)
                         if self.cut_ratio < 1.0:
                             utils.cut_video_dir(video_output_dir, self.cut_ratio)
                     page_id += 1
