@@ -61,20 +61,21 @@ class CosClient(object):
             src_dir = os.path.join(src_dir, video_id)
 
             for files in os.listdir(src_dir):
-                src_path = os.path.join(src_dir, files)
-                dest_path = 'audio/video/bilibili/' + account_id + '/' + video_id + '/' + files
+                if not files.endswith('xml'):
+                    src_path = os.path.join(src_dir, files)
+                    dest_path = 'audio/video/bilibili/' + account_id + '/' + video_id + '/' + files
 
-                logging.info("Uploading file {}".format(src_path))
+                    logging.info("Uploading file {}".format(src_path))
 
-                response = self.client.upload_file(
-                    Bucket=self.bucket_name,
-                    LocalFilePath= src_path,
-                    Key=dest_path,
-                    PartSize=1,
-                    MAXThread=10,
-                    EnableMD5=False
-                )
-                print(response['ETag'])
+                    response = self.client.upload_file(
+                        Bucket=self.bucket_name,
+                        LocalFilePath= src_path,
+                        Key=dest_path,
+                        PartSize=1,
+                        MAXThread=10,
+                        EnableMD5=False
+                    )
+                    print(response['ETag'])
             self.save_uploaded_list(line)
 
     def save_uploaded_list(self, line):
