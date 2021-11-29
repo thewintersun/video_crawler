@@ -7,6 +7,7 @@ import logging
 import string
 import subprocess
 import sys
+import time
 
 import cv2
 import os
@@ -266,6 +267,8 @@ def download_video(url, save_dir, low_res_ratio):
                 cmd_str = f'you-get -f -o ' + save_dir + ' --playlist ' + url
             ret = subprocess.run(cmd_str, encoding="utf-8", shell=True)
             ret = ret.returncode
+            # sleep 5 secs after every download
+            time.sleep(5)
         except Exception as e:
             logging.error("download fail : {}".format(e))
         finally:
