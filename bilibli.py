@@ -157,6 +157,7 @@ class BiliBiliSpider(object):
                 page_id = 1
                 total_page_number = 1000000
                 while page_id <= total_page_number:
+                    time.sleep(5)
                     api_url = "https://api.bilibili.com/x/space/arc/search?mid={}&ps=30&tid=0&pn={}&keyword=&order=pubdate&jsonp=jsonp".format(
                         accout_id, page_id)
                     logging.warning(api_url)
