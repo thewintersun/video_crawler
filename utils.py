@@ -264,6 +264,7 @@ def download_video(url, save_dir, low_res_ratio):
         time.sleep(5)
         #如果下载不成功，可能被限制了，sleep 100秒
         if ret != 0:
+            logging.warning("download error : {} sleep 100s".format(url))
             time.sleep(100)
         return ret
 
