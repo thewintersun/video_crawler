@@ -275,6 +275,7 @@ def download_video(url, save_dir, low_res_ratio):
     while i < len(opt_list) and ret != 0:
         try:
             cmd_str = f'you-get -f -o ' + save_dir + ' --playlist -F ' + opt_list[i] + ' ' + url
+            logging.warning(cmd_str)
             ret = subprocess.run(cmd_str, encoding="utf-8", shell=True)
             ret = ret.returncode
             # sleep 5 secs after every download
