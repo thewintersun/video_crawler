@@ -258,6 +258,7 @@ def download_video(url, save_dir, low_res_ratio):
 
     if low_res_ratio == 0:
         cmd_str = f'you-get -f -o ' + save_dir + ' --playlist ' + url
+        logging.warning(cmd_str)
         ret = subprocess.run(cmd_str, encoding="utf-8", shell=True)
         ret = ret.returncode
         # sleep 5 secs after every download
