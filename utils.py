@@ -262,6 +262,9 @@ def download_video(url, save_dir, low_res_ratio):
         ret = ret.returncode
         # sleep 5 secs after every download
         time.sleep(5)
+        #如果下载不成功，可能被限制了，sleep 100秒
+        if ret != 0:
+            time.sleep(100)
         return ret
 
     # low_res_ratio == 1
