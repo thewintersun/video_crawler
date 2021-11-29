@@ -256,15 +256,21 @@ def download_video(url, save_dir, low_res_ratio):
     if not os.path.exists(save_dir):
         os.mkdir(save_dir)
 
+    if low_res_ratio == 0:
+        cmd_str = f'you-get -f -o ' + save_dir + ' --playlist ' + url
+        ret = subprocess.run(cmd_str, encoding="utf-8", shell=True)
+        ret = ret.returncode
+        # sleep 5 secs after every download
+        time.sleep(5)
+        return ret
+
+    # low_res_ratio == 1
     opt_list = ['dash-flv480', 'dash-flv720', 'dash-flv1080']
     i = 0
     ret = 2
     while i < len(opt_list) and ret != 0:
         try:
-            if low_res_ratio == 1:
-                cmd_str = f'you-get -f -o ' + save_dir + ' --playlist -F ' + opt_list[i] + ' ' + url
-            else:
-                cmd_str = f'you-get -f -o ' + save_dir + ' --playlist ' + url
+            cmd_str = f'you-get -f -o ' + save_dir + ' --playlist -F ' + opt_list[i] + ' ' + url
             ret = subprocess.run(cmd_str, encoding="utf-8", shell=True)
             ret = ret.returncode
             # sleep 5 secs after every download
