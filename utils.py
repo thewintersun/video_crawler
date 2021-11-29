@@ -238,6 +238,7 @@ def cut_video_dir(dir, cut_ratio):
         file_suffix = f.split('.')[-1]
 
         if file_suffix in format_list and not file_name.endswith('cut'):
+            print(f)
             input_path = os.path.join(dir, f)
             print(input_path)
             output_filename = str_trans(file_name) + "_cut."+file_suffix
