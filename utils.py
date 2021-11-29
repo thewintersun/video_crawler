@@ -204,7 +204,7 @@ def cut_video(input_path, output_path, cut_ratio):
     video_capture.release()
 
 def cut_video_ffmpeg(input_path, output_path, cut_ratio):
-    logging.info("ffmpeg cut : {}".format(input_path))
+    logging.warning("ffmpeg cut : {}".format(input_path))
 
     video_capture = cv2.VideoCapture(input_path)
     width = int(video_capture.get(cv2.CAP_PROP_FRAME_WIDTH))
@@ -214,6 +214,7 @@ def cut_video_ffmpeg(input_path, output_path, cut_ratio):
     new_height = height - height_start
 
     cmd_str = f'ffmpeg -i "' + input_path + '" -strict -2 -vf crop=' + str(width) + ':' + str(new_height) + ':0:' + str(height_start) + ' -y ' + output_path
+    logging.warning(cmd_str)
     ret = subprocess.run(cmd_str, encoding="utf-8", shell=True)
     return ret.returncode
 
