@@ -247,7 +247,7 @@ def cut_video_dir(dir, cut_ratio):
                 os.remove(input_path)
 
 
-def download_video(url, save_dir):
+def download_video(url, save_dir, low_res_ratio):
     """
     通过you-get来下载某个视频到指定文件夹
     :param save_dir: 下载到的文件夹
@@ -260,7 +260,10 @@ def download_video(url, save_dir):
     ret = 2
     while i < len(opt_list) and ret != 0:
         try:
-            cmd_str = f'you-get -f -o ' + save_dir + ' --playlist -F ' + opt_list[i] + ' ' + url
+            if low_res_ratio == 1:
+                cmd_str = f'you-get -f -o ' + save_dir + ' --playlist -F ' + opt_list[i] + ' ' + url
+            else:
+                cmd_str = f'you-get -f -o ' + save_dir + ' --playlist ' + url
             ret = subprocess.run(cmd_str, encoding="utf-8", shell=True)
             ret = ret.returncode
         except Exception as e:

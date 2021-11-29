@@ -56,6 +56,8 @@ class BiliBiliSpider(object):
         # 输出文件夹
         self.output_dir = args.output_dir
 
+        self.low_res_ratio = args.low_res_ratio
+
         self.cut_ratio = args.cut_ratio
 
         self.crawled_account_id_file = os.path.join(self.output_dir, 'temp_account_crawled')
@@ -176,7 +178,7 @@ class BiliBiliSpider(object):
 
                         video_output_dir = os.path.join(output_dir, video_id)
 
-                        ret = utils.download_video(video_url, video_output_dir)
+                        ret = utils.download_video(video_url, video_output_dir, self.low_res_ratio)
 
                         self.save_crawled_video(accout_id, video_id)
 
@@ -208,7 +210,7 @@ def main():
     parser.add_argument('input_file', help='输入的up主主页地址列表文件')
     parser.add_argument('output_dir', help='输出文件夹路径，末尾不要带斜杠')
     parser.add_argument('-n', help='多进程数量（默认为1）', type=int, default=1)
-
+    parser.add_argument('--low_res_ratio', help='是否开启低分辨率下载。有时候下载低分辨率有问题，需要下载默认的',  default=1)
     parser.add_argument('--cut_ratio', help='因为只需要字幕，节省存储资源，将视频画面裁剪，保留底部开始的比例', type=float, default=0.3)
     parser.add_argument('--log', help='输出log到文件，否则输出到控制台', action='store_true')
     args = parser.parse_args()
