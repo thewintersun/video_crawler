@@ -56,6 +56,10 @@ class CosClient(object):
         for line in self.account_crawled_list:
             account_id = line.strip()
             account_path = os.path.join(self.upload_dir, account_id)
+            if not os.path.exists(account_path):
+                logging.error(account_path + "not exist")
+                continue
+
             for video_id in os.listdir(account_path):
 
                 src_dir = os.path.join(account_path, video_id)
