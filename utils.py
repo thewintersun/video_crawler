@@ -287,3 +287,20 @@ def download_video(url, save_dir, low_res_ratio):
         finally:
             i = i + 1
     return ret
+
+def video2wav(input_path, output_path):
+    logging.warning("video2wav : {}".format(input_path))
+    cmd_str = f'ffmpeg -i "' + input_path + '" -ab 16 -ar 16000 -ac 1 -y "' + output_path + '"'
+    logging.warning(cmd_str)
+    ret = subprocess.run(cmd_str, encoding="utf-8", shell=True)
+    return ret.returncode
+
+if __name__ == "__main__":
+    files = "c:\\work\\剧情和战斗超燃的国产漫画没做成动画实在是可惜_cut.mp4"
+    file_suffix = files.split('.')[-1]
+    file_prefix = '.'.join(files.split('.')[:-1])
+    print(file_suffix)
+    print(file_prefix)
+
+    #video2wav("c:\\work\\剧情和战斗超燃的国产漫画没做成动画实在是可惜_cut.mp4", "c:\\work\\剧情和战斗超燃的国产漫画没做成动画实在是可惜_cut.wav")
+    pass
