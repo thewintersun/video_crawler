@@ -56,7 +56,6 @@ class CosClient(object):
         for line in self.upload_list:
             line = line.strip()
 
-
             account_id, video_id = line.split()
             src_dir = os.path.join(self.upload_dir, account_id)
             src_dir = os.path.join(src_dir, video_id)
@@ -133,7 +132,6 @@ def main():
                         level=logging.DEBUG, filename=log_flag)
 
     client = CosClient(args)
-
     client.upload()
 
 if __name__ == "__main__":
