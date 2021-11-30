@@ -22,22 +22,22 @@ class CosClient(object):
         self.client = CosS3Client(config)
 
         self.upload_dir = args.upload_dir
-        self.upload_file_list = os.path.join(self.upload_dir, "temp_video_crawled")
+        self.account_crawled_file = os.path.join(self.upload_dir, "temp_account_crawled")
         self.uploaded_file_list = os.path.join(self.upload_dir, "uploaded_list")
         self.meta_file = os.path.join(self.upload_dir, "meta_info")
 
-        self.upload_list = []
+        self.account_crawled_list = []
         self.uploaded_dict = {}
 
         self.bucket_name = 'ml-data-1301298951'
 
     def load_data(self):
         try:
-            if os.path.exists(self.upload_file_list):
-                with codecs.open(self.upload_file_list, 'r', 'utf-8') as fr:
+            if os.path.exists(self.account_crawled_file):
+                with codecs.open(self.account_crawled_file, 'r', 'utf-8') as fr:
                     for line in fr:
                         line = line.strip()
-                        self.upload_list.append(line)
+                        self.account_crawled_list.append(line)
         except Exception as e:
             logging.error('Load upload_file_list : {}'.format(e))
 
@@ -53,60 +53,62 @@ class CosClient(object):
     def upload(self):
         self.load_data()
         file_suffix_list = ['mp4', 'flv']
-        for line in self.upload_list:
-            line = line.strip()
+        for line in self.account_crawled_list:
+            account_id = line.strip()
+            account_path = os.path.join(self.upload_dir, account_id)
+            for video_id in os.listdir(account_path):
 
-            account_id, video_id = line.split()
-            src_dir = os.path.join(self.upload_dir, account_id)
-            src_dir = os.path.join(src_dir, video_id)
-
-            for files in os.listdir(src_dir):
-                file_suffix = files.split('.')[-1]
-                file_prefix = '.'.join(files.split('.')[:-1])
-                tag = account_id + "_" + video_id + "_" + file_prefix
-                if tag in self.uploaded_dict:
+                src_dir = os.path.join(account_path, video_id)
+                if not os.path.isdir(src_dir):
                     continue
 
-                if file_suffix in file_suffix_list:
-                    file_prefix = file_prefix.replace("-", "_")
-                    src_path = os.path.join(src_dir, files)
-                    wav_src_path = os.path.join(src_dir, file_prefix+".wav")
+                for files in os.listdir(src_dir):
+                    file_suffix = files.split('.')[-1]
+                    file_prefix = '.'.join(files.split('.')[:-1])
+                    tag = account_id + "_" + video_id + "_" + file_prefix
+                    if tag in self.uploaded_dict:
+                        continue
 
-                    utils.video2wav(src_path, wav_src_path)
+                    if file_suffix in file_suffix_list:
+                        file_prefix = file_prefix.replace("-", "_")
+                        src_path = os.path.join(src_dir, files)
+                        wav_src_path = os.path.join(src_dir, file_prefix+".wav")
 
-                    cos_dir = 'audio/video/bilibili/'
+                        utils.video2wav(src_path, wav_src_path)
 
-                    cos_video_dest_path = cos_dir + account_id + '/' + video_id + '/' + file_prefix+ "." + file_suffix
-                    cos_wav_dest_path = cos_dir + account_id + '/' + video_id + '/' + file_prefix+".wav"
+                        cos_dir = 'audio/video/bilibili/'
 
-                    logging.info("Uploading file {}".format(src_path))
+                        cos_video_dest_path = cos_dir + account_id + '/' + video_id + '/' + file_prefix+ "." + file_suffix
+                        cos_wav_dest_path = cos_dir + account_id + '/' + video_id + '/' + file_prefix+".wav"
 
-                    response = self.client.upload_file(
-                        Bucket=self.bucket_name,
-                        LocalFilePath= src_path,
-                        Key=cos_video_dest_path,
-                        PartSize=1,
-                        MAXThread=10,
-                        EnableMD5=False
-                    )
+                        logging.warning("Uploading file {}".format(src_path))
 
-                    response = self.client.upload_file(
-                        Bucket=self.bucket_name,
-                        LocalFilePath=wav_src_path,
-                        Key=cos_wav_dest_path,
-                        PartSize=1,
-                        MAXThread=10,
-                        EnableMD5=False
-                    )
+                        response = self.client.upload_file(
+                            Bucket=self.bucket_name,
+                            LocalFilePath= src_path,
+                            Key=cos_video_dest_path,
+                            PartSize=1,
+                            MAXThread=10,
+                            EnableMD5=False
+                        )
 
-                    meta_line = tag + " https://" + self.bucket_name + ".cos." + configinfo.COS_REGION + ".myqcloud.com/" \
-                            + cos_dir + account_id + '/' + video_id + "/" + file_prefix+ "." + file_suffix
-                    logging.info(meta_line)
-                    self.save_meta_info(meta_line)
-                    self.save_uploaded_list(tag)
-                    self.uploaded_dict[tag] = 1
-                else:
-                    logging.error("file suffix not video format: {}".format(files))
+                        response = self.client.upload_file(
+                            Bucket=self.bucket_name,
+                            LocalFilePath=wav_src_path,
+                            Key=cos_wav_dest_path,
+                            PartSize=1,
+                            MAXThread=10,
+                            EnableMD5=False
+                        )
+
+                        meta_line = tag + " https://" + self.bucket_name + ".cos." + configinfo.COS_REGION + ".myqcloud.com/" \
+                                + cos_dir + account_id + '/' + video_id + "/" + file_prefix+ "." + file_suffix
+                        logging.info(meta_line)
+                        self.save_meta_info(meta_line)
+                        self.save_uploaded_list(tag)
+                        self.uploaded_dict[tag] = 1
+                    else:
+                        logging.error("file suffix not video format: {}".format(files))
 
     def save_uploaded_list(self, line):
         with codecs.open(self.uploaded_file_list, 'a', 'utf-8') as fw:
