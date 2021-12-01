@@ -115,7 +115,8 @@ class CosClient(object):
                         self.save_uploaded_list(tag)
                         self.uploaded_dict[tag] = 1
                     else:
-                        logging.info("file suffix not video format: {}".format(files))
+                        if file_suffix != 'xml':
+                            logging.info("file suffix not video format: {}".format(files))
 
     def save_uploaded_list(self, line):
         with codecs.open(self.uploaded_file_list, 'a', 'utf-8') as fw:
