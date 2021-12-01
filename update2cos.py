@@ -70,6 +70,10 @@ class CosClient(object):
                     file_suffix = files.split('.')[-1]
                     file_prefix = '.'.join(files.split('.')[:-1])
                     tag = account_id + "_" + video_id + "_" + file_prefix
+
+                    # ignore not endwith '_cut' files.
+                    if not file_prefix.endswith("_cut"):
+                        continue
                     if tag in self.uploaded_dict:
                         continue
 
