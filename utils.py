@@ -296,11 +296,8 @@ def video2wav(input_path, output_path):
     return ret.returncode
 
 if __name__ == "__main__":
-    files = "c:\\work\\剧情和战斗超燃的国产漫画没做成动画实在是可惜_cut.mp4"
-    file_suffix = files.split('.')[-1]
-    file_prefix = '.'.join(files.split('.')[:-1])
-    print(file_suffix)
-    print(file_prefix)
 
-    #video2wav("c:\\work\\剧情和战斗超燃的国产漫画没做成动画实在是可惜_cut.mp4", "c:\\work\\剧情和战斗超燃的国产漫画没做成动画实在是可惜_cut.wav")
+
+    ret = video2wav("c:\\work\\剧情和战斗超燃的国产漫画没做成动画实在是可惜.mp4", "c:\\work\\3月26日加拿大的天文摄影爱好者用望_cut.wav")
+    print(ret)
     pass

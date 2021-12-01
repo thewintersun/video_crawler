@@ -78,7 +78,10 @@ class CosClient(object):
                         src_path = os.path.join(src_dir, files)
                         wav_src_path = os.path.join(src_dir, file_prefix+".wav")
 
-                        utils.video2wav(src_path, wav_src_path)
+                        ret = utils.video2wav(src_path, wav_src_path)
+                        if ret != 0:
+                            logging.warning("no audio stream in video file. jump next one. {}".format(src_path))
+                            continue
 
                         cos_dir = 'audio/video/bilibili/'
 
