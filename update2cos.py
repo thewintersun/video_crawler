@@ -132,6 +132,15 @@ class CosClient(object):
             line = line.strip()
             fw.write(line + '\n')
 
+    def upload_single_file(self, local_file, remote_path):
+        response = self.client.upload_file(
+            Bucket=self.bucket_name,
+            LocalFilePath=local_file,
+            Key=remote_path,
+            PartSize=1,
+            MAXThread=10,
+            EnableMD5=False
+        )
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('upload_dir', help='之前下载的文件夹，会将这个文件夹下的文件上传到cos上')
@@ -147,6 +156,12 @@ def main():
 
     client = CosClient(args)
     client.upload()
+
+def test():
+    parser = argparse.ArgumentParser()
+    args = parser.parse_args()
+    client = CosClient(args)
+    client.upload_single_file("/home/ubuntu/code/github/kaldi/egs/wenet1w/s5/data/train.tar.gz", "audio/video/bilibili/train.tar.gz")
 
 if __name__ == "__main__":
     main()
