@@ -42,7 +42,6 @@ def retry_download(data_dir):
 
 
 if __name__ == "__main__":
-    pass
     parser = argparse.ArgumentParser()
     parser.add_argument('input_dir', help='输入的up主主页地址列表文件')
     args = parser.parse_args()
