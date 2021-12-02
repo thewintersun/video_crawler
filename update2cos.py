@@ -8,6 +8,9 @@ from qcloud_cos import CosS3Client
 import utils
 import codecs
 
+# pip install -U cos-python-sdk-v5
+
+
 class CosClient(object):
     def __init__(self, args):
         secret_id = configinfo.COS_SID      # 替换为用户的 SecretId，请登录访问管理控制台进行查看和管理，https://console.cloud.tencent.com/cam/capi
