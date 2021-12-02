@@ -144,6 +144,8 @@ class CosClient(object):
             MAXThread=10,
             EnableMD5=False
         )
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('upload_dir', help='之前下载的文件夹，会将这个文件夹下的文件上传到cos上')
