@@ -93,7 +93,6 @@ class CosClient(object):
                         cos_dir = 'audio/video/bilibili/'
 
                         cos_video_dest_path = cos_dir + account_id + '/' + video_id + '/' + file_prefix+ "." + file_suffix
-                        cos_wav_dest_path = cos_dir + account_id + '/' + video_id + '/' + file_prefix+".wav"
 
                         logging.warning("Uploading file {}".format(src_path))
 
@@ -101,15 +100,6 @@ class CosClient(object):
                             Bucket=self.bucket_name,
                             LocalFilePath= src_path,
                             Key=cos_video_dest_path,
-                            PartSize=1,
-                            MAXThread=10,
-                            EnableMD5=False
-                        )
-
-                        response = self.client.upload_file(
-                            Bucket=self.bucket_name,
-                            LocalFilePath=wav_src_path,
-                            Key=cos_wav_dest_path,
                             PartSize=1,
                             MAXThread=10,
                             EnableMD5=False
@@ -166,7 +156,7 @@ def test():
     parser = argparse.ArgumentParser()
     args = parser.parse_args()
     client = CosClient(args)
-    client.upload_single_file("/home/ubuntu/code/github/kaldi/egs/wenet1w/s5/data/train.tar.gz", "audio/video/bilibili/train.tar.gz")
+    client.upload_single_file("./train.tar.gz", "audio/video/bilibili/train.tar.gz")
 
 if __name__ == "__main__":
     main()
