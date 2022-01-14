@@ -8,8 +8,9 @@ git clone https://github.com/thewintersun/video_crawler.git
 - Install require package
 ``` sh
 apt install python3-opencv
-
-pip install -r requirements.txt
+pip3 install --upgrade pip
+python3 -m pip install opencv-python
+pip3 install -r requirements.txt
 ```
 - Prepare bilibili url list file
 
