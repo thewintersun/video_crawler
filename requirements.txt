@@ -2,4 +2,5 @@ bs4
 you-get
 requests
 cos-python-sdk-v5
+scikit-build
 opencv-python
